@@ -47,13 +47,13 @@ function enableHamburger() {
 }
 
 export function loadHeaderFooter() {
-  loadTemplate("/partials/header.html").then((template) => {
+  loadTemplate("../partials/header.html").then((template) => {
     renderWithTemplate(template, qs("#main-header"), null, () => {
       enableHamburger();
     });
   });
 
-  loadTemplate("/partials/footer.html").then((template) => {
+  loadTemplate("../partials/footer.html").then((template) => {
     renderWithTemplate(template, qs("#main-footer"), null, () => {
       const yearElement = qs("#current-year");
       if (yearElement) {
