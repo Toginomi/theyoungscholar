@@ -8,8 +8,7 @@
     "build": "vite build --emptyOutDir",
     "lint": "eslint *.js src/**/*.js",
     "format": "prettier --ignore-path ./.gitignore --write \"./**/*.{html,json,js,ts,css}\"",
-    "test": "jest",
-    "dev": "npm run lint && npm run format && npm run build"
+    "test": "jest"
   },
   "devDependencies": {
     "vite": "^7.3.1"
