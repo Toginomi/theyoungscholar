@@ -9,6 +9,10 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'src/index.html'),
         about: resolve(__dirname, 'src/about-us/index.html'),
+        mentors: resolve(__dirname, 'src/mentors/index.html'),
+        register: resolve(__dirname, 'src/register/index.html'),
+        login: resolve(__dirname, 'src/login/index.html'),
+        hub: resolve(__dirname, 'src/tys-hub/index.html'),
       },
     },
   },
