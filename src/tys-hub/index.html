@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Hub | The Young Scholar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/public/images/tys-logo.png" type="image/png">
+    <script type="module" src="/js/hub.js"></script>
+</head>
+<body>
+    <header id="main-header"></header>
+
+    <main id="hub-container">
+        <section class="hub-header">
+            <h1 class="page-title">TYS Review Hub</h1>
+         </section>
+
+        <div class="controls">
+            <button class="filter-btn active" data-filter="all" title="Show all lessons">All</button>
+            <button class="filter-btn" data-filter="Math" title="Show Math lessons">Math</button>
+            <button class="filter-btn" data-filter="Science" title="Show Science lessons">Science</button>
+            <button class="filter-btn" data-filter="Verbal" title="Show Verbal lessons">Verbal</button>
+            <button class="filter-btn" data-filter="Abstract" title="Show Abstract lessons">Abstract</button>
+            <button class="filter-btn" data-filter="saved" id="filter-saved" title="Show only saved lessons">
+                <i class="fas fa-bookmark"></i> Saved
+            </button>
+        </div>
+
+        <div id="lesson-grid" class="card-grid">
+            <div class="loading-spinner">
+                <i class="fas fa-circle-notch fa-spin"></i> Loading Lessons...
+            </div>
+        </div>
+
+        <dialog id="dialogBox">
+            <div class="dialog-header">
+                <h3 id="modalTitle">Course Title</h3>
+                <button id="closeButton" title="Close the dialog box"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modalDetails"></div>
+        </dialog>
+
+        <dialog id="quizModal">
+            <div class="dialog-header quiz-head">
+                <div class="header-left">
+                    <i class="fas fa-brain"></i>
+                    <h3 id="quizTitle">AI Practice Quiz</h3>
+                </div>
+                <button id="closeQuizTop" class="close-modal-btn" title="Close the quiz dialog">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="quiz-progress-container"><div id="quiz-progress-bar"></div></div>
+            <div id="quizContent">
+                <div id="quizBody"></div>
+            </div>
+        </dialog>
+    </main>
+
+    <footer id="main-footer"></footer>
+</body>
+</html>

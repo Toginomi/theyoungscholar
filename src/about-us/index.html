@@ -6,8 +6,10 @@
     <title>About Us | The Young Scholar</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="icon" href="/images/tys-logo.png" type="image/png">
+    <link rel="icon" href="/public/images/tys-logo.png" type="image/png">
+    
     <script type="module" src="/js/about.js"></script>
 </head>
 <body>
@@ -15,39 +17,64 @@
 
     <main>
         <div id="about-us-content">
-            <h1>About The Young Scholar</h1>
+            <h1 class="about-title">About The Young Scholar</h1>
             
-            <div id="introduction">
-                <h2>Introduction</h2>
-                <p>The Young Scholar Hub is dedicated to empowering the next generation of Filipino scientists. We provide accessible, high-quality review materials created by Pisay Alumni to help students ace the NCE.</p>
-                <br>
-                <p>We believe that every student has the potential to achieve their Pisay dreams. We are committed to fostering critical thinking and problem-solving skills that serve students beyond just the exams.</p>
-            </div>
-
-            <section class="courses">
-                <h2>Our Courses</h2>
-
-                <div class="course-card" id="card-math">
-                    <h3>Quantitative Ability</h3>
-                    <button class="modal-trigger" data-course="math">Learn More</button>
-                </div>
-
-                <div class="course-card" id="card-science">
-                    <h3>Scientific Ability</h3>
-                    <button class="modal-trigger" data-course="science">Learn More</button>
-                </div>
-
-                <div class="course-card" id="card-english">
-                    <h3>Verbal Aptitude</h3>
-                    <button class="modal-trigger" data-course="english">Learn More</button>
-                </div>
+            <div id="about-layout-wrapper">
                 
-                <div class="course-card" id="card-abstract">
-                    <h3>Abstract Reasoning</h3>
-                    <button class="modal-trigger" data-course="abstract">Learn More</button>
+                <div id="introduction">
+                    <h2>Introduction</h2>
+                    
+                    <p>
+                        <strong>The Young Scholar</strong> is a premier NCE Review Program dedicated to empowering the next generation of Filipino scientists, innovators, and leaders. Founded and led by alumni of the Philippine Science High School (Pisay), our platform serves as a bridge between aspiring students and the world-class education offered by the PSHS System. 
+                    </p>
+
+                    <p>
+                        We believe that every student, regardless of their background, possesses a unique spark of genius and the potential to achieve their Pisay dreams. To turn that potential into reality, we provide an integrated learning experience that goes beyond static handouts. Our program offers high-quality, alumni-vetted curriculum, interactive AI-powered diagnostics, and a supportive community of mentors who have successfully walked the path themselves.
+                    </p>
+
+                    <p>
+                        Our mission is to democratize elite-level education. We are committed to fostering academic excellence, critical thinking, and the confidence required to ace the National Competitive Examination (NCE). At <strong>The Young Scholar</strong>, we aren't just teaching subjects; we are nurturing the future pioneers of Philippine science and technology.
+                    </p>
                 </div>
-            </section>
+
+                <section class="courses-container">
+                    <h2 class="section-subtitle">Courses</h2>
+                    <div class="course-list">
+                        
+                        <div class="course-card">
+                            <h3>Quantitative Ability</h3>
+                            <button id="btnMath" class="modal-trigger" title="Learn more about Quantitative Ability">Learn More</button>
+                        </div>
+
+                        <div class="course-card">
+                            <h3>Scientific Ability</h3>
+                            <button id="btnScience" class="modal-trigger" title="Learn more about Scientific Ability">Learn More</button>
+                        </div>
+
+                        <div class="course-card">
+                            <h3>Verbal Aptitude</h3>
+                            <button id="btnEnglish" class="modal-trigger" title="Learn more about Verbal Aptitude">Learn More</button>
+                        </div>
+                        
+                        <div class="course-card">
+                            <h3>Abstract Reasoning</h3>
+                            <button id="btnAbstract" class="modal-trigger" title="Learn more about Abstract Reasoning">Learn More</button>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
         </div>
+
+        <dialog id="dialogBox">
+            <div class="dialog-header">
+                <h3 id="modalTitle">Course Title</h3>
+                <button id="closeButton" aria-label="Close modal" title="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="modalDetails"></div>
+        </dialog>
     </main>
 
     <footer id="main-footer"></footer>

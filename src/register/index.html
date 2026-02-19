@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Profile | The Young Scholar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/public/images/tys-logo.png" type="image/png">
+    <script type="module" src="/js/register.js"></script>
+</head>
+<body>
+    <header id="main-header"></header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-user-graduate"></i>
+                <h1>Scholar Registration</h1>
+                <p>Set up your local profile to track your NCE progress.</p>
+            </div>
+
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" placeholder="e.g. Isaac Newton" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" placeholder="scholar@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-campus">Target Pisay Campus</label>
+                    <select id="reg-campus" required>
+                        <option value="" disabled selected>Select your target campus</option>
+                        <option value="Main Campus">Main Campus (Diliman)</option>
+                        <option value="EVC">Eastern Visayas Campus (EVC)</option>
+                        <option value="WVC">Western Visayas Campus (WVC)</option>
+                        <option value="SMC">Southern Mindanao Campus (SMC)</option>
+                        <option value="CLC">Central Luzon Campus (CLC)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-full">Create Local Profile</button>
+            </form>
+
+            <div id="reg-feedback" class="feedback-container"></div>
+            
+            <p class="auth-note">Note: Your data is stored locally on this browser for your review privacy.</p>
+        </div>
+    </main>
+
+    <footer id="main-footer"></footer>
+</body>
+</html>

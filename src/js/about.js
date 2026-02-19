@@ -1,11 +1,5 @@
-import { loadHeaderFooter, qs } from "./utils.mjs";
+import { loadHeaderFooter } from "./utils.mjs";
+import { initCourseModals } from "./modal.js";
 
 loadHeaderFooter();
-
-const buttons = document.querySelectorAll(".modal-trigger");
-buttons.forEach(button => {
-    button.addEventListener("click", () => {
-        const course = button.getAttribute("data-course");
-        console.log(`Loading details for: ${course}`);
-    });
-});
+initCourseModals();
