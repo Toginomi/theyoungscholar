@@ -13,6 +13,7 @@ export default defineConfig({
         register: resolve(__dirname, 'src/register/index.html'),
         login: resolve(__dirname, 'src/login/index.html'),
         hub: resolve(__dirname, 'src/tys-hub/index.html'),
+        profile: resolve(__dirname, 'src/profile/index.html'),
       },
     },
   },

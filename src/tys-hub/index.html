@@ -15,46 +15,75 @@
     <main id="hub-container">
         <section class="hub-header">
             <h1 class="page-title">TYS Review Hub</h1>
-         </section>
+            <p class="page-subtitle">Master the NCE with localized, expert-led lessons.</p>
+        </section>
 
-        <div class="controls">
-            <button class="filter-btn active" data-filter="all" title="Show all lessons">All</button>
-            <button class="filter-btn" data-filter="Math" title="Show Math lessons">Math</button>
-            <button class="filter-btn" data-filter="Science" title="Show Science lessons">Science</button>
-            <button class="filter-btn" data-filter="Verbal" title="Show Verbal lessons">Verbal</button>
-            <button class="filter-btn" data-filter="Abstract" title="Show Abstract lessons">Abstract</button>
-            <button class="filter-btn" data-filter="saved" id="filter-saved" title="Show only saved lessons">
-                <i class="fas fa-bookmark"></i> Saved
-            </button>
-        </div>
+        <section class="progress-dashboard">
+            <div class="progress-info">
+                <span><i class="fas fa-graduation-cap"></i> Scholar Progress: <strong id="completion-text">0/0</strong> Lessons</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-track">
+                <div id="hub-progress-bar" aria-label="Course completion progress"></div>
+            </div>
+        </section>
+
+        <section class="hub-controls">
+            <div class="hub-controls-row">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="hub-search" placeholder="Search lessons..." aria-label="Search Lessons">
+                </div>
+
+                <div class="filter-group" id="subject-filters">
+                    <button class="filter-btn active" data-type="subject" data-filter="all">All</button>
+                    <button class="filter-btn" data-type="subject" data-filter="Math">Math</button>
+                    <button class="filter-btn" data-type="subject" data-filter="Science">Science</button>
+                    <button class="filter-btn" data-type="subject" data-filter="Verbal">Verbal</button>
+                    <button class="filter-btn" data-type="subject" data-filter="Abstract">Abstract</button>
+                </div>
+
+                <span class="filter-separator" aria-hidden="true">|</span>
+
+                <div class="filter-group">
+                    <button class="filter-btn" data-type="status" data-filter="completed" id="filter-completed">
+                        <i class="fas fa-check-circle"></i> Done
+                    </button>
+                </div>
+            </div>
+        </section>
 
         <div id="lesson-grid" class="card-grid">
             <div class="loading-spinner">
-                <i class="fas fa-circle-notch fa-spin"></i> Loading Lessons...
+                <i class="fas fa-circle-notch fa-spin"></i> Loading Scholar Resources...
             </div>
         </div>
 
-        <dialog id="dialogBox">
+        <dialog id="dialogBox" class="lesson-modal">
             <div class="dialog-header">
                 <h3 id="modalTitle">Course Title</h3>
-                <button id="closeButton" title="Close the dialog box"><i class="fas fa-times"></i></button>
+                <button id="closeButton" aria-label="Close lesson details"><i class="fas fa-times"></i></button>
             </div>
-            <div id="modalDetails"></div>
+            <div id="modalDetails">
+                </div>
         </dialog>
 
-        <dialog id="quizModal">
+        <dialog id="quizModal" class="quiz-modal">
             <div class="dialog-header quiz-head">
                 <div class="header-left">
                     <i class="fas fa-brain"></i>
-                    <h3 id="quizTitle">AI Practice Quiz</h3>
+                    <h3 id="quizTitle">Practice Quiz</h3>
                 </div>
-                <button id="closeQuizTop" class="close-modal-btn" title="Close the quiz dialog">
+                <button id="closeQuizTop" class="close-modal-btn" aria-label="Close quiz">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="quiz-progress-container"><div id="quiz-progress-bar"></div></div>
+            <div id="quiz-progress-container">
+                <div id="quiz-progress-bar"></div>
+            </div>
             <div id="quizContent">
-                <div id="quizBody"></div>
+                <div id="quizBody">
+                    </div>
             </div>
         </dialog>
     </main>

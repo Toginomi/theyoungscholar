@@ -1,21 +1,64 @@
 <div class="top-bar">
-    <div class="branding">
-        <div class="logo-wrapper">
-            <img src="/images/tys-logo.png" alt="TYS Logo" width="50">
+    <a href="/" class="branding-link" title="Return to homepage">
+        <div class="branding">
+            <div class="logo-wrapper">
+                <img src="/images/tys-logo.png" alt="TYS Logo" width="50">
+            </div>
+            <span class="site-title">The Young Scholar</span>
         </div>
-        <span class="site-title">The Young Scholar</span>
-    </div>
+    </a>
+
+    <nav class="main-nav">
+        <ul class="nav-links">
+            <li><a href="/" title="Go to homepage">Home</a></li>
+            <li><a href="/about-us/" title="Read about Us">About Us</a></li>
+            <li><a href="/mentors/" title="See our mentors">Our Mentors</a></li>
+        </ul>
+    </nav>
 
     <div class="top-actions">
-        <a href="/register/" class="register-btn">Register</a>
-        <button id="hamburger" class="menu-toggle" aria-label="Open navigation" title="Toggle navigation menu">☰</button>
+        <a href="/register/" class="register-btn" id="register-nav-btn" title="Sign Up">Register</a>
+        
+        <div class="user-menu-wrapper hidden" id="user-menu">
+            <button class="user-trigger" id="user-menu-trigger" title="User account menu">
+                <i class="fas fa-user-circle"></i>
+            </button>
+            <div class="user-dropdown" id="user-dropdown">
+                <div class="dropdown-header">Hi, <span id="user-display-name">Scholar</span>!</div>
+                <hr>
+                <a href="/tys-hub/" class="dropdown-item">
+                    <i class="fas fa-th-large"></i> TYS Hub
+                </a>
+                <a href="/profile/" class="dropdown-item">
+                    <i class="fas fa-id-card"></i> View Profile
+                </a>
+                <button id="logout-btn-dropdown" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <button id="hamburger" class="menu-toggle" aria-label="Open navigation">
+            <div class="hamburger-box">
+                <span class="hamburger-inner"></span>
+            </div>
+        </button>
     </div>
 </div>
 
-<nav class="main-nav">
-    <ul class="nav-links">
-        <li><a href="/" title="Go to homepage">Home</a></li>
-        <li><a href="/about-us/" title="Read about The Young Scholar">About Us</a></li>
-        <li><a href="/mentors/" title="See our mentors">Our Mentors</a></li>
-    </ul>
-</nav>
+<div id="mobile-drawer" class="mobile-drawer">
+    <div class="drawer-content">
+        <a href="/login/" class="drawer-login-btn">
+            <i class="fas fa-user"></i> SIGN IN
+        </a>
+        <ul class="drawer-links">
+            <li><a href="/">Home <i class="fas fa-chevron-right"></i></a></li>
+            <li><a href="/about-us/">About Us <i class="fas fa-chevron-right"></i></a></li>
+            <li><a href="/mentors/">Our Mentors <i class="fas fa-chevron-right"></i></a></li>
+
+            <li class="auth-only hidden"><a href="/tys-hub/">TYS Hub <i class="fas fa-user-graduate"></i></a></li>
+            <li class="auth-only hidden"><a href="/profile/">View Profile <i class="fas fa-id-card"></i></a></li>
+            <li class="auth-only hidden"><button id="drawer-logout-btn" class="drawer-logout-link">Logout <i class="fas fa-sign-out-alt"></i></button></li>
+        </ul>
+    </div>
+</div>

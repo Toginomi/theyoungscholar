@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholar Profile | TYS</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="module" src="/js/profile.js"></script>
+</head>
+<body>
+    <header id="main-header"></header>
+
+    <main class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <h1>Scholar Profile</h1>
+                <p class="profile-subtitle">Manage your local NCE preparation data</p>
+            </div>
+
+            <form id="profile-form">
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <label for="prof-name" class="detail-label">Full Name</label>
+                        <input type="text" id="prof-name" name="fullname" class="profile-input" 
+                               placeholder="e.g. Isaac Newton" aria-label="Full Name" readonly>
+                    </div>
+
+                    <div class="detail-item">
+                        <label for="prof-email" class="detail-label">Email Address</label>
+                        <input type="email" id="prof-email" name="email" class="profile-input" 
+                               placeholder="scholar@email.com" aria-label="Email Address" readonly>
+                    </div>
+
+                    <div class="detail-item">
+                        <label for="prof-campus" class="detail-label">Target Campus</label>
+                        <select id="prof-campus" name="campus" class="profile-input" 
+                                aria-label="Select Target Campus" disabled>
+                            <option value="Main Campus">Main Campus (Diliman)</option>
+                            <option value="EVC">Eastern Visayas Campus (EVC)</option>
+                            <option value="WVC">Western Visayas Campus (WVC)</option>
+                            <option value="SMC">Southern Mindanao Campus (SMC)</option>
+                            <option value="CLC">Central Luzon Campus (CLC)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="profile-controls">
+                    <button type="button" id="edit-btn" class="btn-secondary">Edit Profile</button>
+                    <button type="submit" id="save-btn" class="btn-primary hidden">Save Changes</button>
+                </div>
+            </form>
+
+            <div class="profile-actions">
+                <button id="logout-btn" class="btn-danger">Logout of Profile</button>
+                <p class="logout-note">Your data stays on this browser until cleared.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer id="main-footer"></footer>
+</body>
+</html>

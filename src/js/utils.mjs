@@ -1,131 +1,161 @@
-export function qs(selector, parent = document) {
-  return parent.querySelector(selector);
-}
+/**
+ * Utility functions for The Young Scholar (TYS)
+ */
 
-export function getLocalStorage(key) {
-  return JSON.parse(localStorage.getItem(key));
-}
+export function qs(selector, parent = document) { return parent.querySelector(selector); }
+export function getLocalStorage(key) { return JSON.parse(localStorage.getItem(key)); }
+export function setLocalStorage(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
-export function setLocalStorage(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
-export function setClick(selector, callback) {
-  qs(selector).addEventListener("touchend", (event) => {
-    event.preventDefault();
-    callback();
-  });
-  qs(selector).addEventListener("click", callback);
+export async function loadTemplate(path) {
+  const res = await fetch(path);
+  return await res.text();
 }
 
 export function renderWithTemplate(template, parentElement, data, callback) {
   parentElement.innerHTML = template;
-  if(callback) {
-    callback(data);
-  }
+  if (callback) callback(data);
 }
 
-export async function loadTemplate(path) {
-  const res = await fetch(path);
-  const template = await res.text();
-  return template;
-}
-
+/**
+ * Mobile Navigation Logic
+ */
 function enableHamburger() {
   const menuBtn = qs("#hamburger");
-  const navContainer = qs(".main-nav");
+  const drawer = qs("#mobile-drawer");
 
-  if (menuBtn && navContainer) {
-    menuBtn.addEventListener("click", () => {
-      navContainer.classList.toggle("open");
-      const expanded = navContainer.classList.contains("open");
-      menuBtn.setAttribute("aria-expanded", expanded);
-      menuBtn.classList.toggle("rotated", expanded);
+  if (menuBtn && drawer) {
+    menuBtn.onclick = (e) => {
+      e.stopPropagation();
+      const isOpen = drawer.classList.toggle("open");
+      menuBtn.classList.toggle("rotated", isOpen);
+    };
+
+    window.addEventListener("click", () => {
+      drawer.classList.remove("open");
+      menuBtn.classList.remove("rotated");
     });
+    
+    drawer.onclick = (e) => e.stopPropagation();
   }
 }
 
 /**
- * UPDATED: Persistent Header State Logic
- * Handles 3 states: Guest (Register), Returning (Login), and Scholar (Hi + Logout)
+ * Header State & User Greeting (Handles Desktop Dropdown & Mobile Drawer)
  */
 function updateHeaderState() {
   const userData = getLocalStorage('tys-user-profile');
-  const returningUser = localStorage.getItem('tys-returning-user'); // The "cookie" flag
+  
+  // Desktop elements
+  const userMenu = qs('#user-menu');
+  const registerBtn = qs('#register-nav-btn');
   const navList = qs('.nav-links');
-  const authArea = qs('.top-actions');
+  const desktopName = qs('#user-display-name');
+
+  // Mobile drawer elements
+  const drawerGreeting = qs('#drawer-user-greeting');
+  const drawerName = qs('#drawer-user-name');
+  const drawerSignIn = qs('.drawer-login-btn');
+  const authOnlyLinks = document.querySelectorAll('.auth-only');
 
   if (userData) {
-    // --- STATE 1: ACTIVE SCHOLAR ---
-    if (navList) {
-      const hubExists = Array.from(navList.querySelectorAll('a'))
-                             .some(a => a.textContent.includes('Lesson Hub'));
-      if (!hubExists) {
-        const hubLi = document.createElement('li');
-        hubLi.innerHTML = `<a href="/tys-hub/">TYS Hub</a>`;
-        navList.appendChild(hubLi);
-      }
-    }
+    const firstName = userData.name ? userData.name.split(' ')[0] : 'Scholar';
 
-    if (authArea) {
-      const registerBtn = authArea.querySelector('.register-btn');
-      if (registerBtn) registerBtn.remove();
+    // 1. Desktop Setup
+    if (userMenu) userMenu.classList.remove('hidden');
+    if (registerBtn) registerBtn.classList.add('hidden');
+    if (desktopName) desktopName.textContent = firstName;
 
-      if (!qs('.scholar-nav-info')) {
-        const scholarInfo = document.createElement('div');
-        scholarInfo.className = 'scholar-nav-info';
-        scholarInfo.style.display = "flex";
-        scholarInfo.style.alignItems = "center";
-        scholarInfo.style.gap = "10px";
-        
-        scholarInfo.innerHTML = `
-          <span class="user-name-header" style="font-weight:600; font-size:0.9rem;">Hi, ${userData.name.split(' ')[0]}!</span>
-          <button id="logout-btn" style="background:none; border:none; text-decoration:underline; cursor:pointer; font-size:0.8rem; padding:0;">Logout</button>
-        `;
-        authArea.prepend(scholarInfo);
+    // 2. Mobile Drawer Setup
+    if (drawerSignIn) drawerSignIn.classList.add('hidden'); // Hides Sign In on Mobile
+    if (drawerGreeting) drawerGreeting.classList.remove('hidden');
+    if (drawerName) drawerName.textContent = firstName;
+    authOnlyLinks.forEach(link => link.classList.remove('hidden'));
 
-        const logoutBtn = qs('#logout-btn');
-        if (logoutBtn) {
-          logoutBtn.onclick = () => {
-            if (confirm("Logout of your scholar profile?")) {
-              // Set the returning user flag (our "cookie")
-              localStorage.setItem('tys-returning-user', 'true');
-              // Clear only the active profile
-              localStorage.removeItem('tys-user-profile');
-              window.location.href = "/";
-            }
-          };
-        }
-      }
+    // 3. Inject Hub link to Desktop Nav if missing
+    if (navList && !Array.from(navList.querySelectorAll('a')).some(a => a.textContent.includes('TYS Hub'))) {
+      const hubLi = document.createElement('li');
+      hubLi.innerHTML = `<a href="/tys-hub/">TYS Hub</a>`;
+      navList.appendChild(hubLi);
     }
-  } else if (returningUser) {
-    // --- STATE 2: RETURNING USER (SHOW LOGIN) ---
-    const authBtn = qs('.register-btn');
-    if (authBtn) {
-      authBtn.textContent = "Login";
-      // Point this to your login page or back to hub to trigger re-auth
-      authBtn.href = "/login/"; 
-      authBtn.classList.add('login-mode');
-    }
+    
+    setupUserMenu();
+    setupDrawerLogout(); 
+  } else {
+    // Guest State
+    if (userMenu) userMenu.classList.add('hidden');
+    if (registerBtn) registerBtn.classList.remove('hidden');
+    if (drawerSignIn) drawerSignIn.classList.remove('hidden'); // Shows Sign In on Mobile
+    if (drawerGreeting) drawerGreeting.classList.add('hidden');
+    authOnlyLinks.forEach(link => link.classList.add('hidden'));
   }
-  // --- STATE 3: PURE GUEST ---
-  // Default HTML handles this (shows "Register")
 }
 
-export function loadHeaderFooter() {
-  loadTemplate("../partials/header.html").then((template) => {
-    renderWithTemplate(template, qs("#main-header"), null, () => {
-      enableHamburger();
-      updateHeaderState();
+/**
+ * Desktop User Account Dropdown
+ */
+function setupUserMenu() {
+  const trigger = qs('#user-menu-trigger');
+  const dropdown = qs('#user-dropdown');
+  const logoutBtn = qs('#logout-btn-dropdown');
+
+  if (trigger && dropdown) {
+    trigger.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation(); 
+      dropdown.classList.toggle('show');
+    };
+
+    window.addEventListener('click', () => {
+      dropdown.classList.remove('show');
     });
+
+    dropdown.onclick = (e) => e.stopPropagation();
+  }
+
+  if (logoutBtn) {
+    logoutBtn.onclick = handleLogout;
+  }
+}
+
+/**
+ * Mobile Drawer Logout
+ */
+function setupDrawerLogout() {
+  const drawerLogout = qs('#drawer-logout-btn');
+  if (drawerLogout) {
+    drawerLogout.onclick = handleLogout;
+  }
+}
+
+/**
+ * Shared Logout Logic
+ */
+function handleLogout() {
+  localStorage.removeItem('tys-user-profile');
+  window.location.href = "/";
+}
+
+/**
+ * Main Loader
+ */
+export function loadHeaderFooter() {
+  loadTemplate("/partials/header.html").then((template) => {
+    const headerEl = qs("#main-header");
+    if (headerEl) {
+      renderWithTemplate(template, headerEl, null, () => {
+        enableHamburger();
+        updateHeaderState();
+      });
+    }
   });
 
-  loadTemplate("../partials/footer.html").then((template) => {
-    renderWithTemplate(template, qs("#main-footer"), null, () => {
-      const yearElement = qs("#current-year");
-      if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
-      }
-    });
+  loadTemplate("/partials/footer.html").then((template) => {
+    const footerEl = qs("#main-footer");
+    if (footerEl) {
+      renderWithTemplate(template, footerEl, null, () => {
+        const year = qs("#current-year");
+        if (year) year.textContent = new Date().getFullYear();
+      });
+    }
   });
 }

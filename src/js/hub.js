@@ -1,4 +1,4 @@
-import { loadHeaderFooter, qs } from "./utils.mjs";
+import { loadHeaderFooter, qs, getLocalStorage, setLocalStorage } from "./utils.mjs";
 import { startQuiz } from "./quiz.js";
 
 // Configuration
@@ -7,13 +7,20 @@ const SHEET_ID = '1kN86UlO-dPnrDFtGZVw6gJAU6xoUzLjxD3nqpjapTYY';
 const RANGE = 'Lessons!A2:H';
 
 let allLessons = []; 
+let completedLessons = getLocalStorage('tys-completed-lessons') || [];
+
+// Global Filter State (Search | Subject | Done)
+let filterState = {
+    subject: 'all',
+    status: 'all', 
+    query: ''
+};
 
 /**
- * 1. ROUTE GUARD (Criterion 1: Robust Logic)
- * Prevents non-registered users from accessing the hub.
+ * 1. ROUTE GUARD
  */
 function checkAccess() {
-    const userData = localStorage.getItem('tys-user-profile');
+    const userData = getLocalStorage('tys-user-profile');
     if (!userData) {
         alert("🔒 Access Restricted: Please register to enter the Lesson Hub.");
         window.location.href = "/";
@@ -23,39 +30,27 @@ function checkAccess() {
 }
 
 /**
- * 2. DASHBOARD LOGIC (Criterion 6: LocalStorage)
- * Populates the blue stats box with user data.
+ * 2. DASHBOARD & PROGRESS UI
  */
 function updateDashboard() {
-    const userData = JSON.parse(localStorage.getItem('tys-user-profile'));
-    const bookmarks = getBookmarks();
-    const dashboard = qs('#scholar-dashboard');
-
-    if (userData && dashboard) {
-        dashboard.classList.remove('dashboard-hidden');
+    const userData = getLocalStorage('tys-user-profile');
+    if (userData && qs('#dash-user-name')) {
         qs('#dash-user-name').textContent = userData.name.split(' ')[0];
-        qs('#dash-user-campus').textContent = userData.targetCampus;
-        qs('#dash-bookmark-count').textContent = bookmarks.length;
-        
-        // Retrieve High Score (Property 5)
-        const bestScore = localStorage.getItem('tys-best-score') || "0";
-        qs('#dash-quiz-score').textContent = bestScore;
-
-        // Reset Profile (Criterion 5: Events)
-        const resetBtn = qs('#reset-profile');
-        if (resetBtn) {
-            resetBtn.onclick = () => {
-                if(confirm("Logging out will clear your local profile. Proceed?")) {
-                    localStorage.clear();
-                    window.location.href = "/";
-                }
-            };
-        }
     }
+    updateProgressUI(allLessons.length);
+}
+
+function updateProgressUI(totalLessons) {
+    const count = completedLessons.length;
+    const percent = totalLessons > 0 ? Math.round((count / totalLessons) * 100) : 0;
+    
+    if (qs('#hub-progress-bar')) qs('#hub-progress-bar').style.width = `${percent}%`;
+    if (qs('#completion-text')) qs('#completion-text').textContent = `${count} / ${totalLessons}`;
+    if (qs('#progress-percent')) qs('#progress-percent').textContent = `${percent}%`;
 }
 
 /**
- * 3. DATA FETCHING (Criterion 2: Third-party API)
+ * 3. DATA FETCHING
  */
 async function fetchLessons() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
@@ -75,30 +70,61 @@ async function fetchLessons() {
 }
 
 /**
- * 4. RENDERING LOGIC
+ * 4. MASTER FILTER LOGIC
+ * Default: Shows "Undone" lessons.
+ * Active (Done clicked): Shows "Completed" lessons.
+ */
+function applyFilters() {
+    const filtered = allLessons.filter(lesson => {
+        // 1. Match Subject
+        const matchesSubject = filterState.subject === 'all' || lesson.subject === filterState.subject;
+        
+        // 2. Match Search Query
+        const matchesSearch = lesson.title.toLowerCase().includes(filterState.query.toLowerCase()) || 
+                             lesson.summary.toLowerCase().includes(filterState.query.toLowerCase());
+        
+        // 3. Status Toggle Logic
+        const isLessonDone = completedLessons.includes(lesson.id);
+        let matchesStatus = false;
+
+        if (filterState.status === 'completed') {
+            // If "Done" filter is ON, show only finished lessons
+            matchesStatus = isLessonDone;
+        } else {
+            // If "Done" filter is OFF, show only unfinished lessons
+            matchesStatus = !isLessonDone;
+        }
+
+        return matchesSubject && matchesSearch && matchesStatus;
+    });
+
+    renderLessons(filtered);
+}
+
+/**
+ * 5. RENDERING LOGIC
  */
 function renderLessons(lessonsToRender) {
     const grid = qs('#lesson-grid');
+    if (!grid) return;
     grid.innerHTML = ''; 
-    const bookmarks = getBookmarks();
-
-    // Sync stats every render
+    
     updateDashboard();
 
     if (lessonsToRender.length === 0) {
-        grid.innerHTML = `<div class="no-results">No lessons found. Try a different filter!</div>`;
+        grid.innerHTML = `<div class="no-results">No lessons found matching your filters.</div>`;
         return;
     }
 
     lessonsToRender.forEach((lesson, index) => {
-        const isBookmarked = bookmarks.some(b => b.id === lesson.id);
-        const bookmarkIcon = isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark';
+        const isCompleted = completedLessons.includes(lesson.id);
         
         const card = document.createElement('div');
-        card.className = 'lesson-card';
+        card.className = `lesson-card ${isCompleted ? 'completed' : ''}`;
         card.style.animationDelay = `${index * 0.05}s`;
 
         card.innerHTML = `
+            ${isCompleted ? '<div class="completed-badge"><i class="fas fa-check"></i> Done</div>' : ''}
             <div class="card-header">
                 <span class="badge ${lesson.subject.toLowerCase()}">${lesson.subject}</span>
                 <span class="difficulty">${lesson.difficulty}</span>
@@ -108,19 +134,17 @@ function renderLessons(lessonsToRender) {
             <div class="card-actions">
                 <button class="btn-learn-more">Learn More</button>
                 <button class="btn-quiz-trigger"><i class="fas fa-brain"></i> Quiz</button>
-                <button class="btn-save" title="Save as bookmark"><i class="${bookmarkIcon}"></i></button>
+                <button class="btn-complete" title="Toggle Completion Status">
+                    <i class="${isCompleted ? 'fas' : 'far'} fa-check-circle"></i>
+                </button>
             </div>
         `;
 
-        // Event Listeners
         card.querySelector('.btn-learn-more').onclick = () => openLessonModal(lesson);
         card.querySelector('.btn-quiz-trigger').onclick = () => startQuiz(lesson.subject, lesson.title);
-        card.querySelector('.btn-save').onclick = (e) => {
-            toggleBookmark(lesson.id, lesson.title, lesson.subject);
-            const icon = e.currentTarget.querySelector('i');
-            icon.classList.toggle('fas');
-            icon.classList.toggle('far');
-            updateDashboard(); // Instant update to dashboard count
+        card.querySelector('.btn-complete').onclick = () => {
+            toggleLessonComplete(lesson.id, allLessons.length);
+            applyFilters();
         };
 
         grid.appendChild(card);
@@ -128,7 +152,7 @@ function renderLessons(lessonsToRender) {
 }
 
 /**
- * 5. MODAL LOGIC (Criterion 4: Advanced CSS/UI)
+ * 6. MODAL & HELPERS
  */
 function openLessonModal(lesson) {
     const modal = qs('#dialogBox');
@@ -138,13 +162,10 @@ function openLessonModal(lesson) {
     let videoEmbed = '';
     if (lesson.video) {
         let embedUrl = lesson.video;
-        if (lesson.video.includes('drive.google.com')) {
-            embedUrl = lesson.video.split('/view')[0] + '/preview';
-        } else if (lesson.video.includes('youtube.com') || lesson.video.includes('youtu.be')) {
+        if (lesson.video.includes('youtube.com') || lesson.video.includes('youtu.be')) {
             const videoId = lesson.video.split('v=')[1]?.split('&')[0] || lesson.video.split('/').pop();
             embedUrl = `https://www.youtube.com/embed/${videoId}`;
         }
-
         videoEmbed = `<div class="video-container"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
     }
 
@@ -152,67 +173,71 @@ function openLessonModal(lesson) {
         <div class="modal-scroll-content">
             ${videoEmbed}
             <div class="modal-body-text">
-                <h4>Lesson Overview</h4>
                 <p>${lesson.body}</p>
-                <hr>
-                <p><small>Subject: ${lesson.subject} | Level: ${lesson.difficulty}</small></p>
+                <button id="modal-complete-btn" class="btn-full ${completedLessons.includes(lesson.id) ? 'btn-done' : ''}">
+                    ${completedLessons.includes(lesson.id) ? 'Mark as Incomplete' : 'Mark as Finished'}
+                </button>
             </div>
         </div>
     `;
 
-    qs('#closeButton').onclick = () => {
-        const iframe = modal.querySelector('iframe');
-        if (iframe) iframe.src = ""; // Stops audio on close
+    qs('#modal-complete-btn').onclick = () => {
+        toggleLessonComplete(lesson.id, allLessons.length);
         modal.close();
+        applyFilters();
     };
 
+    qs('#closeButton').onclick = () => modal.close();
     modal.showModal();
 }
 
-/**
- * 6. BOOKMARK HELPERS
- */
-function getBookmarks() {
-    return JSON.parse(localStorage.getItem("tys_bookmarks")) || [];
-}
-
-function toggleBookmark(lessonId, lessonTitle, lessonSubject) {
-    let bookmarks = getBookmarks();
-    const index = bookmarks.findIndex(b => b.id === lessonId);
-    if (index === -1) {
-        bookmarks.push({ id: lessonId, title: lessonTitle, subject: lessonSubject });
+export function toggleLessonComplete(lessonId, totalLessons) {
+    if (completedLessons.includes(lessonId)) {
+        completedLessons = completedLessons.filter(id => id !== lessonId);
     } else {
-        bookmarks.splice(index, 1);
+        completedLessons.push(lessonId);
     }
-    localStorage.setItem("tys_bookmarks", JSON.stringify(bookmarks));
+    
+    setLocalStorage('tys-completed-lessons', completedLessons);
+    updateProgressUI(totalLessons);
 }
 
 /**
  * 7. INITIALIZATION
  */
 async function init() {
-    if (!checkAccess()) return; // Stop if not logged in
-
+    if (!checkAccess()) return;
     loadHeaderFooter();
+    
     allLessons = await fetchLessons();
     renderLessons(allLessons);
-    updateDashboard();
 
-    // Filter Button Logic
+    const searchInput = qs('#hub-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            filterState.query = e.target.value;
+            applyFilters();
+        });
+    }
+
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const clickedBtn = e.currentTarget;
-            clickedBtn.classList.add('active');
-            
-            const category = clickedBtn.dataset.filter;
-            if (category === 'all') renderLessons(allLessons);
-            else if (category === 'saved') {
-                const savedIds = getBookmarks().map(b => b.id);
-                renderLessons(allLessons.filter(l => savedIds.includes(l.id)));
-            } else {
-                renderLessons(allLessons.filter(l => l.subject === category));
+            const target = e.currentTarget;
+            const type = target.dataset.type;
+            const value = target.dataset.filter;
+
+            if (type === 'subject') {
+                const subjectGroup = target.closest('#subject-filters');
+                subjectGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                target.classList.add('active');
+                filterState.subject = value;
+            } 
+            else if (type === 'status') {
+                filterState.status = (filterState.status === 'completed') ? 'all' : 'completed';
+                target.classList.toggle('active', filterState.status === 'completed');
             }
+
+            applyFilters();
         });
     });
 }

@@ -45,7 +45,7 @@ function initRegister() {
 
         // 5. Redirect
         setTimeout(() => {
-            window.location.href = '/tys-hub/index.html';
+            window.location.href = '/tys-hub/';
         }, 2000);
     });
 }
