@@ -53,7 +53,7 @@ function personalizeHome() {
             startBtn.textContent = "Continue Review";
             startBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.location.href = "/tys-hub/index.html";
+                window.location.href = "/tys-hub/";
             });
         }
     } else {

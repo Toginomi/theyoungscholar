@@ -71,29 +71,15 @@ async function fetchLessons() {
 
 /**
  * 4. MASTER FILTER LOGIC
- * Default: Shows "Undone" lessons.
- * Active (Done clicked): Shows "Completed" lessons.
  */
 function applyFilters() {
     const filtered = allLessons.filter(lesson => {
-        // 1. Match Subject
         const matchesSubject = filterState.subject === 'all' || lesson.subject === filterState.subject;
-        
-        // 2. Match Search Query
         const matchesSearch = lesson.title.toLowerCase().includes(filterState.query.toLowerCase()) || 
                              lesson.summary.toLowerCase().includes(filterState.query.toLowerCase());
         
-        // 3. Status Toggle Logic
         const isLessonDone = completedLessons.includes(lesson.id);
-        let matchesStatus = false;
-
-        if (filterState.status === 'completed') {
-            // If "Done" filter is ON, show only finished lessons
-            matchesStatus = isLessonDone;
-        } else {
-            // If "Done" filter is OFF, show only unfinished lessons
-            matchesStatus = !isLessonDone;
-        }
+        let matchesStatus = (filterState.status === 'completed') ? isLessonDone : !isLessonDone;
 
         return matchesSubject && matchesSearch && matchesStatus;
     });
@@ -118,7 +104,6 @@ function renderLessons(lessonsToRender) {
 
     lessonsToRender.forEach((lesson, index) => {
         const isCompleted = completedLessons.includes(lesson.id);
-        
         const card = document.createElement('div');
         card.className = `lesson-card ${isCompleted ? 'completed' : ''}`;
         card.style.animationDelay = `${index * 0.05}s`;
@@ -132,8 +117,8 @@ function renderLessons(lessonsToRender) {
             <h2>${lesson.title}</h2>
             <p>${lesson.summary}</p>
             <div class="card-actions">
-                <button class="btn-learn-more">Learn More</button>
-                <button class="btn-quiz-trigger"><i class="fas fa-brain"></i> Quiz</button>
+                <button class="btn-learn-more" title="Open lesson">Learn More</button>
+                <button class="btn-quiz-trigger" title="Load AI quizzer"><i class="fas fa-brain"></i> Quiz</button>
                 <button class="btn-complete" title="Toggle Completion Status">
                     <i class="${isCompleted ? 'fas' : 'far'} fa-check-circle"></i>
                 </button>
@@ -152,7 +137,7 @@ function renderLessons(lessonsToRender) {
 }
 
 /**
- * 6. MODAL & HELPERS
+ * 6. MODAL & VIDEO EMBED HELPERS
  */
 function openLessonModal(lesson) {
     const modal = qs('#dialogBox');
@@ -162,11 +147,25 @@ function openLessonModal(lesson) {
     let videoEmbed = '';
     if (lesson.video) {
         let embedUrl = lesson.video;
+        
+        // 1. Check for YouTube
         if (lesson.video.includes('youtube.com') || lesson.video.includes('youtu.be')) {
             const videoId = lesson.video.split('v=')[1]?.split('&')[0] || lesson.video.split('/').pop();
             embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        } 
+        // 2. Check for Google Drive
+        else if (lesson.video.includes('drive.google.com')) {
+            // Converts /view or /open to /preview so it can be embedded
+            embedUrl = lesson.video.replace(/\/view.*|\/open.*/, '/preview');
         }
-        videoEmbed = `<div class="video-container"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+
+        videoEmbed = `
+            <div class="video-container">
+                <iframe src="${embedUrl}" frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>`;
     }
 
     details.innerHTML = `
@@ -209,6 +208,9 @@ async function init() {
     if (!checkAccess()) return;
     loadHeaderFooter();
     
+    // Add sticky footer class to body
+    document.body.classList.add('sticky-footer-body');
+
     allLessons = await fetchLessons();
     renderLessons(allLessons);
 

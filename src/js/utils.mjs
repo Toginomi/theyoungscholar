@@ -54,7 +54,7 @@ function updateHeaderState() {
   // Mobile drawer elements
   const drawerGreeting = qs('#drawer-user-greeting');
   const drawerName = qs('#drawer-user-name');
-  const drawerSignIn = qs('.drawer-login-btn');
+  const drawerSignIn = qs('.drawer-login-btn'); 
   const authOnlyLinks = document.querySelectorAll('.auth-only');
 
   if (userData) {
@@ -66,7 +66,7 @@ function updateHeaderState() {
     if (desktopName) desktopName.textContent = firstName;
 
     // 2. Mobile Drawer Setup
-    if (drawerSignIn) drawerSignIn.classList.add('hidden'); // Hides Sign In on Mobile
+    if (drawerSignIn) drawerSignIn.classList.add('hidden'); 
     if (drawerGreeting) drawerGreeting.classList.remove('hidden');
     if (drawerName) drawerName.textContent = firstName;
     authOnlyLinks.forEach(link => link.classList.remove('hidden'));
@@ -84,10 +84,31 @@ function updateHeaderState() {
     // Guest State
     if (userMenu) userMenu.classList.add('hidden');
     if (registerBtn) registerBtn.classList.remove('hidden');
-    if (drawerSignIn) drawerSignIn.classList.remove('hidden'); // Shows Sign In on Mobile
+    if (drawerSignIn) drawerSignIn.classList.remove('hidden'); 
     if (drawerGreeting) drawerGreeting.classList.add('hidden');
     authOnlyLinks.forEach(link => link.classList.add('hidden'));
   }
+
+  // Set Active Navigation State
+  setActiveLink();
+}
+
+/**
+ * Sets the 'active' class on nav links based on current URL
+ */
+function setActiveLink() {
+  const currentPath = window.location.pathname;
+  // Select all links in both desktop and mobile navigation
+  const allLinks = document.querySelectorAll('.nav-links a, .drawer-links a');
+  
+  allLinks.forEach(link => {
+    const linkPath = link.getAttribute('href');
+    if (linkPath === currentPath || (currentPath === '/' && linkPath === '/index.html')) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
 }
 
 /**
